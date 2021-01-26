@@ -1,34 +1,62 @@
+const Gpio = require('onoff').Gpio;
 const PiCamera = require('pi-camera');
 const hbjs = require('handbrake-js');
+const button = new Gpio(17, 'in', 'falling', { debounceTimeout: 500 });
+const FormData = require('form-data');
+const fs = require('fs');
 
-const fileName = new Date.now()
+button.watch((err, value) => {
+	if (err) {
+		console.log(err);
+	}
+	//console.log(value);
+	if (!value) {
+		console.log('Door is open');
+		const fileName = Date.now();
 
-const myCamera = new PiCamera({
-	mode: 'video',
-	output: `${__dirname}/${fileName}.h264`,
-	width: 1920,
-	height: 1080,
-	timeout: 5000, // Record for 5 seconds
-	nopreview: true,
+		const myCamera = new PiCamera({
+			mode: 'video',
+			output: `${__dirname}/${fileName}.h264`,
+			width: 960,
+			height: 540,
+			timeout: 5000, // Record for 5 seconds
+			nopreview: true,
+		});
+
+		myCamera
+			.record()
+			.then((res) => {
+				console.log('Recording Complete');
+				console.log('Conversion Started');
+				hbjs.exec(
+					{ input: `${fileName}.h264`, output: `${fileName}.mp4` },
+					function (err, stdout, stderr) {
+						console.log('Conversion Complete');
+						console.log('Sending Data');
+						if (err) {
+							throw err;
+							console.log(stdout);
+						} else {
+							const form = new FormData();
+							form.append('videoUrl', fs.createReadStream(`./${fileName}.mp4`));
+
+							form.submit('http://localhost:4000/recordings', (err, res) => {
+								if (err) {
+									console.log(err);
+								} else {
+									res.resume();
+								}
+							});
+						}
+					}
+				);
+			})
+			.catch((error) => {
+				console.log(error);
+			});
+	}
 });
 
-myCamera
-	.record()
-	.then((result) => {
-		console.log('Recording Complete');
-		hbjs
-			.spawn({ input: `${fileName}.h264`, output: `${fileName}.mp4` })
-			.on('error', (err) => {
-				// invalid user input, no video found etc
-			})
-			.on('progress', (progress) => {
-				console.log(
-					'Percent complete: %s, ETA: %s',
-					progress.percentComplete,
-					progress.eta
-				);
-			});
-	})
-	.catch((error) => {
-		console.log(error);
-	});
+process.on('SIGINT', (_) => {
+	button.unexport();
+});

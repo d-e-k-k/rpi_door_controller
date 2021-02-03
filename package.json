@@ -14,4 +14,5 @@
     "onoff": "^6.0.1",
     "pi-camera": "^1.5.0"
   }
+  "license": "ISC"
 }

@@ -1,0 +1,17 @@
+{
+  "name": "capture_video_and_convert",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "handbrake-js": "^5.0.2",
+    "onoff": "^6.0.1",
+    "pi-camera": "^1.5.0"
+  }
+}

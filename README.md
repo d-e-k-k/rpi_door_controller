@@ -17,7 +17,7 @@
 - Bread Board
 - Male to Male and Female to Male Jumpers
 
-* *I am using a normally open ("NO") reed switch. When the magnet is near the switch as it is when the door is closed, the circuit is also closed. When the door opens the circuit also opens. The switch is being monitored for as an input by the raspberry pi that fires when it sees a falling current. Like the release of a pressed button or in our case a door opening and the magnet moving away from the reed switch. If you had a normally closed switch you would want to change the 'falling' to 'rising' when defining the reedSwitch*
+ **I am using a normally open ("NO") reed switch. When the magnet is near the switch as it is when the door is closed, the circuit is also closed. When the door opens the circuit also opens. The switch is being monitored for as an input by the raspberry pi that fires when it sees a falling current. Like the release of a pressed button or in our case a door opening and the magnet moving away from the reed switch. If you had a normally closed switch you would want to change the 'falling' to 'rising' when defining the reedSwitch*
 
 ```js
 const reedSwitch = new Gpio(17, 'in', 'falling', { debounceTimeout: 500 });
